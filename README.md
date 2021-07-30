@@ -29,7 +29,7 @@ $ pip install scikit-learn
 
 ## The KMNIST dataset
 <figure>
-<img src="./images/Figure1.png" width=80% align="center">
+<img src="./images/Figure1.png" width=100% align="center">
 	<span style="font-size: 0.8em; color:gray;"><figcaption align="center">
 		Figure 1: The KMNIST dataset is a drop-in replacement for the standard MNIST dataset. The KMNIST dataset contains examples of handwritten Hiragana characters.
 	</figcaption></span>
@@ -75,7 +75,7 @@ With our project directory structure reviewed, we can move on to implementing ou
 
 ## Implementing a Convolutional Neural Network (CNN) with PyTorch
 <figure>
-<img src="./images/Figure2.png" width=80% align="center">
+<img src="./images/Figure2.png" width=100% align="center">
 	<span style="font-size: 0.8em; color:gray;"><figcaption align="center">
 		Figure 2: The LeNet architecture. We’ll be implementing LeNet with PyTorch
 	</figcaption></span>
