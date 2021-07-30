@@ -31,10 +31,10 @@ $ pip install scikit-learn
 <figure>
 <img src="./images/Figure1.png" width=80% align="center">
 	<span style="font-size: 0.8em; color:gray;"><figcaption align="center">
-		"Figure 1: The KMNIST dataset is a drop-in replacement for the standard MNIST dataset. The KMNIST dataset contains examples of handwritten Hiragana characters."
+		Figure 1: The KMNIST dataset is a drop-in replacement for the standard MNIST dataset. The KMNIST dataset contains examples of handwritten Hiragana characters.
 	</figcaption></span>
 </figure>
-<img src="" width=80%>
+
 
 
 The dataset we are using today is the Kuzushiji-MNIST dataset, or KMNIST, for short. This dataset is meant to be a drop-in replacement for the standard MNIST digits recognition dataset.
