@@ -65,9 +65,9 @@ $ tree . --dirsfirst
 
 We have three Python scripts to review today:  
 
-1. `lenet.py`: Our PyTorch implementation of the famous LeNet architecture  
-2. `train.py`: Trains LeNet on the KMNIST dataset using PyTorch, then serializes the trained model to disk(i.e., model.pth)  
-3. `predict.py`: Loads our trained model from disk, makes predictions on testing images, and displays the results on our screen  
+> 1. `lenet.py`: Our PyTorch implementation of the famous LeNet architecture  
+> 2. `train.py`: Trains LeNet on the KMNIST dataset using PyTorch, then serializes the trained model to disk(i.e., model.pth)  
+> 3. `predict.py`: Loads our trained model from disk, makes predictions on testing images, and displays the results on our screen  
 
 The output directory will be populated with plot.png (a plot of our training/validation loss and accuracy) and model.pth (our trained model file) once we run train.py
 
