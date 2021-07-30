@@ -150,7 +150,7 @@ class LeNet(Module):
 ```
 
 
-<span style="color:#d03e4f">class</span> <span style="color:#dc5519">LeNet</span>(<span style="color:#dc5519">Module</span>):   
+> `class LeNet(Module):`  
 defines the `Lenet` class. Notice how we are subclassing the `Module` object object -- by building our model as a class we can easily
 
 * Reuse variables
