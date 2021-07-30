@@ -94,6 +94,7 @@ The best way to learn about CNNs with PyTorch is to implement one, so with that 
 PyTorch: Training your first Convolutional Neural Network (CNN)
 
 ```python
+{% highlight python linenos %}
 # import the necessary packages
 from torch.nn import Module
 from torch.nn import Conv2d
@@ -102,6 +103,7 @@ from torch.nn import MaxPool2d
 from torch.nn import ReLU
 from torch.nn import LogSoftmax
 from torch import flatten
+{%endhighlight%}
 ```
 
 **Lines 2-8** import our required packages. Let’s break each of them down:
