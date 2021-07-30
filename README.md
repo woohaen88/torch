@@ -148,10 +148,7 @@ class LeNet(Module):
 		self.fc2 = Linear(in_features=500, out_features=classes)
 		self.logSoftmax = LogSoftmax(dim=1)
 ```
-
-
-> `class LeNet(Module):`  
-defines the `Lenet` class. Notice how we are subclassing the `Module` object object -- by building our model as a class we can easily
+**Line 1** defines the `Lenet` class. Notice how we are subclassing the `Module` object object -- by building our model as a class we can easily
 
 * Reuse variables
 * Implement custom functions to generate subnetworks/components(used *very often* when implementing more complex networks, such as ResNet, Inception, etc.)
@@ -164,11 +161,10 @@ The constructor to `LeNet` accepts two variables:
 > 1. `numChannels` : The number of channels in the input images (`1` for grayscale or `3` for RGB)
 > 2. `classes` : Total number of unique class labels in our dataset 
 
-<span style="color:#a48ad7">super</span>(<span style="color:#dc5519">LeNet</span>, self).<span style="color:#a48ad7">\_\_init__</span>()  
+**Line 4** calls the parent constructor (i.e., `Module`) which performs a number of PyTorch-specific operations.
+
 calls the parent constructor (i.e., `Module`) which performs a number of PyTorch-specific operations.
 
 
-//빨강: #d03e4f
-//주황: #dc5519
-//회색: #5a626c
-//보라: #a48ad7
+
+
