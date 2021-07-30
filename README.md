@@ -1,5 +1,12 @@
 # PyTorch: Training your first Convolutional Neural Network
 
+## Title
+[Intro](#Intro)  
+[The KMNIST dataset](#The-KMNIST-dataset)
+[Project structure](#Project-structure)  
+[Implementing a Convolutional Neural Network (CNN) with PyTorch](#Implementing-a-Convolutional-Neural-Network-(CNN)-with-PyTorch)
+
+## Intro
 In this tutorial, you will receive a gentle introduction to training your first Convolutional Neural Network(CNN) using the PyTorch deep learning library. This network will be able to recognize handwritten Hiragana characters.
 That tutorial focused on simple numerical data. we will take the next step and learn how to train a CNN to recognize handwritten Hiragana characters using the Kuzushiji-MNIST (KMNIST) dataset.
 
@@ -94,7 +101,6 @@ The best way to learn about CNNs with PyTorch is to implement one, so with that 
 PyTorch: Training your first Convolutional Neural Network (CNN)
 
 ```python
-{% highlight python linenos %}
 # import the necessary packages
 from torch.nn import Module
 from torch.nn import Conv2d
@@ -103,11 +109,44 @@ from torch.nn import MaxPool2d
 from torch.nn import ReLU
 from torch.nn import LogSoftmax
 from torch import flatten
-{%endhighlight%}
+```
+import our required packages. Let’s break each of them down:
+
+> * `Module`: Rather than using the `Sequential` PyTorch class to implement LeNet, we'll instead subclass the Module object so you can see how PyTorch implements neural networks using classes
+> * `Conv2d` : PyTorch's implementation of convolutional layers
+> * `Linear` : Fully connected layers
+> * `MaxPool2d` : Applies 2D max-pooling to reduce the spatital dimensions of the input volume
+> * `ReLU`: Our ReLU activation function
+> * `LogSoftmax` : Used when building our softmax classifier to return the predicted probabilities of each class
+>* `flatten` : Flattens the output of a multi-dimensional volume (e.g., a CONV or POOL layer) such that we can apply fully connected layers to it
+
+With our imports taken care of, we can implement our `LeNet` class using PyTorch:
+
+```python
+class LeNet(Module):
+	def __init__(self, numChannels, classes):
+		# call the parent constructor
+		super(LeNet, self).__init__()
+
+		# initialize first set of CONV => RELU => POOL layers
+		self.conv1 = Conv2d(in_channels=numChannels, out_channels=20,
+			kernel_size=(5, 5))
+		self.relu1 = ReLU()
+		self.maxpool1 = MaxPool2d(kernel_size=(2, 2), stride=(2, 2))
+
+		# initialize second set of CONV => RELU => POOL layers
+		self.conv2 = Conv2d(in_channels=20, out_channels=50,
+			kernel_size=(5, 5))
+		self.relu2 = ReLU()
+		self.maxpool2 = MaxPool2d(kernel_size=(2, 2), stride=(2, 2))
+
+		# initialize first (and only) set of FC => RELU layers
+		self.fc1 = Linear(in_features=800, out_features=500)
+		self.relu3 = ReLU()
+
+		# initialize our softmax classifier
+		self.fc2 = Linear(in_features=500, out_features=classes)
+		self.logSoftmax = LogSoftmax(dim=1)
 ```
 
-**Lines 2-8** import our required packages. Let’s break each of them down:
-
-	* `Module`: Rather than using the `Sequential` PyTorch class to implement LeNet, we'll instead subclass the Module object so you can see how PyTorch implements neural networks using classes
-
-# torch
+<span style="color:#318ad3">class</span> <span style="color:blue">LeNet(Module):`
