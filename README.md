@@ -150,7 +150,7 @@ class LeNet(Module):
 ```
 
 
-> <span style="color:#d03e4f">class</span> <span style="color:#dc5519">LeNet</span>(<span style="color:#dc5519">Module</span>):   
+<span style="color:#d03e4f">class</span> <span style="color:#dc5519">LeNet</span>(<span style="color:#dc5519">Module</span>):   
 defines the `Lenet` class. Notice how we are subclassing the `Module` object object -- by building our model as a class we can easily
 
 * Reuse variables
@@ -164,7 +164,7 @@ The constructor to `LeNet` accepts two variables:
 > 1. `numChannels` : The number of channels in the input images (`1` for grayscale or `3` for RGB)
 > 2. `classes` : Total number of unique class labels in our dataset 
 
-> <span style="color:#a48ad7">super</span>(<span style="color:#dc5519">LeNet</span>, self).<span style="color:#a48ad7">\_\_init__</span>()  
+<span style="color:#a48ad7">super</span>(<span style="color:#dc5519">LeNet</span>, self).<span style="color:#a48ad7">\_\_init__</span>()  
 calls the parent constructor (i.e., `Module`) which performs a number of PyTorch-specific operations.
 
 
