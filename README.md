@@ -149,4 +149,26 @@ class LeNet(Module):
 		self.logSoftmax = LogSoftmax(dim=1)
 ```
 
-<span style="color:#318ad3">class</span> <span style="color:blue">LeNet(Module):`
+
+> <span style="color:#d03e4f">class</span> <span style="color:#dc5519">LeNet</span>(<span style="color:#dc5519">Module</span>):   
+defines the `Lenet` class. Notice how we are subclassing the `Module` object object -- by building our model as a class we can easily
+
+* Reuse variables
+* Implement custom functions to generate subnetworks/components(used *very often* when implementing more complex networks, such as ResNet, Inception, etc.)
+* Define our own `forward` pass function
+
+**best of all, when defined correctly, PyTorch can automatically apply its autograd module to perform automatic differentiation -- backpropagation is taken care of for us by virtue of the PyTorch library!**  
+
+The constructor to `LeNet` accepts two variables:
+
+> 1. `numChannels` : The number of channels in the input images (`1` for grayscale or `3` for RGB)
+> 2. `classes` : Total number of unique class labels in our dataset 
+
+> <span style="color:#a48ad7">super</span>(<span style="color:#dc5519">LeNet</span>, self).<span style="color:#a48ad7">\_\_init__</span>()  
+calls the parent constructor (i.e., `Module`) which performs a number of PyTorch-specific operations.
+
+
+//빨강: #d03e4f
+//주황: #dc5519
+//회색: #5a626c
+//보라: #a48ad7
