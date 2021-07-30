@@ -5,11 +5,11 @@ That tutorial focused on simple numerical data. we will take the next step and l
 
 As you’ll see, training a CNN on an image dataset isn’t all that different from training a basic multi-layer perceptron (MLP) on numerical data. We still need to: 
 
-	1.	Define our model architecture
-	2.	Load our dataset from disk
-	3.	Loop over our epochs and batches
-	4.	Make predictions and compute our loss
-	5.	Properly zero our gradient, perform backpropagation, and update our model parameters
+	1. Define our model architecture
+	2. Load our dataset from disk
+	3. Loop over our epochs and batches
+	4. Make predictions and compute our loss
+	5. Properly zero our gradient, perform backpropagation, and update our model parameters
 
 Furthermore, this post will also give you some experience with PyTorch’s `DataLoader` implementation which makes it super easy to work with datasets --- becoming proficient with PyTorch’s `DataLoader` is a critical skill you’ll want to develop as a deep learning practitioner. 
 
@@ -65,9 +65,9 @@ $ tree . --dirsfirst
 
 We have three Python scripts to review today:  
 
-	1. `lenet.py`: Our PyTorch implementation of the famous LeNet architecture  
-	2. `train.py`: Trains LeNet on the KMNIST dataset using PyTorch, then serializes the trained model to disk(i.e., model.pth)  
-	3. `predict.py`: Loads our trained model from disk, makes predictions on testing images, and displays the results on our screen  
+1. `lenet.py`: Our PyTorch implementation of the famous LeNet architecture  
+2. `train.py`: Trains LeNet on the KMNIST dataset using PyTorch, then serializes the trained model to disk(i.e., model.pth)  
+3. `predict.py`: Loads our trained model from disk, makes predictions on testing images, and displays the results on our screen  
 
 The output directory will be populated with plot.png (a plot of our training/validation loss and accuracy) and model.pth (our trained model file) once we run train.py
 
