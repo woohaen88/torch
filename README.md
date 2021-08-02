@@ -5,6 +5,7 @@
 [The KMNIST dataset](#The-KMNIST-dataset)
 [Project structure](#Project-structure)  
 [Implementing a Convolutional Neural Network (CNN) with PyTorch](#Implementing-a-Convolutional-Neural-Network-(CNN)-with-PyTorch)
+[Creating our CNN training script with PyTorch](#Creating-our-CNN-training-script-with-PyTorch)
 
 ## Intro
 In this tutorial, you will receive a gentle introduction to training your first Convolutional Neural Network(CNN) using the PyTorch deep learning library. This network will be able to recognize handwritten Hiragana characters.
@@ -161,10 +162,109 @@ The constructor to `LeNet` accepts two variables:
 > 1. `numChannels` : The number of channels in the input images (`1` for grayscale or `3` for RGB)
 > 2. `classes` : Total number of unique class labels in our dataset 
 
-**Line 4** calls the parent constructor (i.e., `Module`) which performs a number of PyTorch-specific operations.
+* calls the parent constructor (i.e., `Module`) which performs a number of PyTorch-specific operations.
 
-calls the parent constructor (i.e., `Module`) which performs a number of PyTorch-specific operations.
+* calls the parent constructor (i.e., `Module`) which performs a number of PyTorch-specific operations.
 
+* Initialize our first set of `CONV => RELU => POOL` layers. Our first CONV layer learns a total of 20 filters, each of which are *5 $\times$ 5*. A ReLU activation function is then applied, followed by a *2 \times 2* max-pooling layer with a *2 $\times$ 2*stride to reduce the spatital dimensions of our input image.
 
+We then have a second set of `CONV => RELU => POOL` layers. We increase the number of filters learned in the CONV layer to 50, but maintain the *5 $\times$ 5* kernel size. Again, a ReLU activation is applied, followed by max-pooling.
 
+Next comes our first and only set of fully connected layers. We define the number of inputs to the layer (`800`) along with our desired number of output nodes (`500`). A ReLU activation follows the FC layer.
 
+Finally, we apply our softmax classifier. The number of `in_features` is set to `500`, which is the *output* dimensionality from the previous layer. We then apply `LogSoftmax` such that we can obtain predicted probabilities during evaluation.
+
+**To build the network architecture itself (i.e, what layer is input to some other layer), we need to override the `forward` method method of the `Module` class**.
+
+The `forward` function serves a number of purpose:  
+1. It connects layers/subnetworks together from variables defined in the constructor (i.e, \_\_init__) of the class
+2. It defines the network architecture itself
+3. It allows the forward pass of the model to be performed, resulting in our output predictions
+4. And, thanks to PyTorch's autograd module, it allows us to perform automatic differentiation and update our model weights.
+
+```python
+	def forward(self, x):
+		# pass the input through our first set of CONV => RELU =>
+		# POOL layers
+		x = self.conv1(x)
+		x = self.relu1(x)
+		x = self.maxpool1(x)
+
+		# pass the output from the previous layer through the second
+		# set of CONV => RELU => POOL layers
+		x = self.conv2(x)
+		x = self.relu2(x)
+		x = self.maxpool2(x)
+
+		# flatten the output from the previous layer and pass it
+		# through our only set of FC => RELU layers
+		x = flatten(x, 1)
+		x = self.fc1(x)
+		x = self.relu3(x)
+
+		# pass the output to our softmax classifier to get our output
+		# predictions
+		x = self.fc2(x)
+		output = self.logSoftmax(x)
+
+		# return the output predictions
+		return output
+```
+
+The `forward` method accepts a single parameter, `x`, which is the batch of input data to the network.
+
+We then connect our `conv1`, `relu1`, and `maxpool1` layers together to form the first `CONV => RELU => POOL` layer of the network.
+
+A similar operation is performed, this time building the second set of `CONV => RELU => POOL` layers.  
+
+At this point, the variable `x` is a multi-dimensional tensor; however, in order to create our fully connected layers, we need to "flatten" this tensor into what essentially amounts to a 1D list of values --- the `flatten` function takes care of this operation for us.
+
+From there, we connect the `fc1` and `relu3` layers to the network architecture, followed by attaching the final `fc2` and `logSoftmax`.
+
+The `output` of the network is then returned to the calling function.  
+
+**Again, I want to reiterate the importance of *initializing variables in the constructor* versus *building the netowrk itself in the `forward` function:***
+
+* The constructor to your `Module` only initializes your layers types. PyTorch keeps track of these variables, but it has no idea how the layers connect to each other.
+
+* For PyTorch to understand the network architecture you're building, you define the `forward` function.  
+
+* Inside the `forward` function you take the variables initialized in your constructor and connect them.
+
+* PyTorch can then make predictions using your network and perform automatic backpropagation, thanks to the autograd module
+
+## Creating our CNN training script with PyTorch
+
+With our CNN architecture implemented, we can move on to creating our training script with PyTorch.
+
+Open the `train.py` file in your project directory structure, and let's get to work:
+
+```python
+# set the matplotlib backend so figures can be saved in the background
+import matplotlib
+matplotlib.use("Agg")
+
+# import the necessary packages
+from pyimagesearch.lenet import LeNet
+from sklearn.metrics import classification_report
+from torch.utils.data import random_split
+from torch.utils.data import DataLoader
+from torchvision.transforms import ToTensor
+from torchvision.datasets import KMNIST
+from torch.optim import Adam
+from torch import nn
+import matplotlib.pyplot as plt
+import numpy as np
+import argparse
+import torch
+import time
+```
+
+Import `matplotlib` and set the appropriate background engine.
+
+From there, we import a number of notable packages:  
+
+* `Lenet`: Our PyTorch implementation of the LeNet CNN from the previous section  
+* `classification_report`: Used to display a detailed classification report on our testing set
+* `random_split`: Constructs a random training/testing split from an input set of data
+* `DataLoader`: PyTorch's *awesome* data loading utility that allows us to effortlessly build data pipelines to train our CNN
