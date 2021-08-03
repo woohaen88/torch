@@ -268,3 +268,75 @@ From there, we import a number of notable packages:
 * `classification_report`: Used to display a detailed classification report on our testing set
 * `random_split`: Constructs a random training/testing split from an input set of data
 * `DataLoader`: PyTorch's *awesome* data loading utility that allows us to effortlessly build data pipelines to train our CNN
+* `ToTensor`: A preprocessing function that converts input data into a PyTorch tensor for us automatically
+* `KMNIST`: The Kuzushiji-MNIST dataset loader built into the PyTorch library
+* `Adam`: The optimizer we'll use to train our neural nework
+* `nn`: PyTorch's neural network implementations
+
+<br>
+
+```python
+# construct the argument parser and parse the arguments
+ap = argparse.ArgumentParser()
+ap.add_argument("-m", "--model", type=str, required=True,
+	help="path to output trained model")
+ap.add_argument("-p", "--plot", type=str, required=True,
+	help="path to output loss/accuracy plot")
+args = vars(ap.parse_args())
+```
+
+We have two command line arguments that need parsing:
+1. `--model`: The path to our output serialized model after training(we save this model to disk so we can use it to make predictions in our `predict.py` script)
+
+2. `--plot`: The path to our output training history plot
+
+Moving on, we now have some important initialization to take care of:
+
+```python
+# define training hyperparameters
+INIT_LR = 1e-3
+BATCH_SIZE = 64
+EPOCHS = 10
+
+# define the train and val splits
+TRAIN_SPLIT = 0.75
+VAL_SPLIT = 1 - TRAIN_SPLIT
+
+# set the device we will be using to train the model
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+```
+
+<br>
+
+Set our initial learning rate, batch size, and number of epochs to tarin for, while it defines our training and validation split size(75% of training, 25% for validation).
+
+`device` variable  then determines our `device`(i.e., whether we'll be using our CPU or GPU).
+
+<br>
+
+```python
+# load the KMNIST dataset
+print("[INFO] loading the KMNIST dataset...")
+trainData = KMNIST(root="data", train=True, download=True,
+	transform=ToTensor())
+testData = KMNIST(root="data", train=False, download=True,
+	transform=ToTensor())
+
+# calculate the train/validation split
+print("[INFO] generating the train/validation split...")
+numTrainSamples = int(len(trainData) * TRAIN_SPLIT)
+numValSamples = int(len(trainData) * VAL_SPLIT)
+(trainData, valData) = random_split(trainData,
+	[numTrainSamples, numValSamples],
+	generator=torch.Generator().manual_seed(42))
+```
+
+above code load the KMNISt dataset using PyTorch's build in `KMNIST` class.
+
+For our `trainData`, we set `train=True` while our `testData` is loaded iwth `train=False`. These Booleans come in handy when working with datasets built into the PyTorch library.
+
+The `download=True` flag indicates that PyTorch will automatically download and cache the KMNIST dataset to disk for us if we had not previously downloaded it.
+
+Also take note of the `transform` parameter --- here we can apply a number of data transformations (outside the scope of this tutorial but will be covered soon). The only transform we need is to convert the NumPy array loaded by PyTorch into a tensor data type.
+
+With our training and testing set loaded, we drive our training and validation set on `calculate the train/validation split`. Using PyTorch's `random_split` funcion, we can easily split our data.
