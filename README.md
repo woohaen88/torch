@@ -5,7 +5,11 @@
 [The KMNIST dataset](#The-KMNIST-dataset)
 [Project structure](#Project-structure)  
 [Implementing a Convolutional Neural Network (CNN) with PyTorch](#Implementing-a-Convolutional-Neural-Network-(CNN)-with-PyTorch)  
-[Creating our CNN training script with PyTorch](#Creating-our-CNN-training-script-with-PyTorch)
+[Creating our CNN training script with PyTorch](#Creating-our-CNN-training-script-with-PyTorch)  
+[Training our CNN with PyTorch
+](#Training-our-CNN-with-PyTorch)  
+[Implementing our PyTorch prediction script](#Implementing-our-PyTorch-prediction-script)  
+[Making predictions with our trained PyTorch model](#Making-predictions-with-our-trained-PyTorch-model)
 
 ## Intro
 In this tutorial, you will receive a gentle introduction to training your first Convolutional Neural Network(CNN) using the PyTorch deep learning library. This network will be able to recognize handwritten Hiragana characters.
@@ -481,3 +485,295 @@ At this point, we've looped over all batches of data in our training set for the
 			valCorrect += (pred.argmax(1) == y).type(
 				torch.float).sum().item()
 ```
+
+When evaluating a PyTorch model on a validation or testing set, you need to first:
+
+1. Use the `torch.no_grad()` context to turn off gradient tracking and computation
+2. Put the model in `eval()` mode
+
+From there, you loop over all validation `DataLoader`, move the data to the correct `device`, and use the data to make predictions and compute your loss.
+
+You can then derive your total number of correct predictions
+
+```python
+# calculate the average training and validation loss
+	avgTrainLoss = totalTrainLoss / trainSteps
+	avgValLoss = totalValLoss / valSteps
+
+	# calculate the training and validation accuracy
+	trainCorrect = trainCorrect / len(trainDataLoader.dataset)
+	valCorrect = valCorrect / len(valDataLoader.dataset)
+
+	# update our training history
+	H["train_loss"].append(avgTrainLoss.cpu().detach().numpy())
+	H["train_acc"].append(trainCorrect)
+	H["val_loss"].append(avgValLoss.cpu().detach().numpy())
+	H["val_acc"].append(valCorrect)
+
+	# print the model training and validation information
+	print("[INFO] EPOCH: {}/{}".format(e + 1, EPOCHS))
+	print("Train loss: {:.6f}, Train accuracy: {:.4f}".format(
+		avgTrainLoss, trainCorrect))
+	print("Val loss: {:.6f}, Val accuracy: {:.4f}\n".format(
+		avgValLoss, valCorrect))
+```
+`avgTrainLoss` and `avgValLoss` compute our average training and validation loss. `trainCorrect` and `valCorrect` do the same thing, but for our training and validation accuracy.
+
+We then take these values and update our training history dictionary .
+
+Finally, we display the training loss, training accuracy, validation loss, and validation accuracy on our terminal.
+
+We’re almost there!
+
+Now that training is complete, we need to evaluate our model on the testing set (previously we’ve only used the training and validation sets):
+
+```python
+# finish measuring how long training took
+endTime = time.time()
+print("[INFO] total time taken to train the model: {:.2f}s".format(
+	endTime - startTime))
+
+# we can now evaluate the network on the test set
+print("[INFO] evaluating network...")
+
+# turn off autograd for testing evaluation
+with torch.no_grad():
+	# set the model in evaluation mode
+	model.eval()
+	
+	# initialize a list to store our predictions
+	preds = []
+
+	# loop over the test set
+	for (x, y) in testDataLoader:
+		# send the input to the device
+		x = x.to(device)
+
+		# make the predictions and add them to the list
+		pred = model(x)
+		preds.extend(pred.argmax(axis=1).cpu().numpy())
+
+# generate a classification report
+print(classification_report(testData.targets.cpu().numpy(),
+	np.array(preds), target_names=testData.classes))
+```
+
+We then set up another `torch.no_grad()` context and put our model in `eval()` mode.
+
+Evaluation is performed by:
+
+1. Initializing a list to store our predictions
+2. Looping over our `testDataLoader`
+3. Sending the current batch of data to the appropriate device
+4. Making predictions on the current batch of data
+5. Updating our `preds` list with the top predictions from the model
+
+Finally, we display a detailed `classification_report`.
+
+The last step we’ll do here is plot our training and validation history, followed by serializing our model weights to disk:
+
+```python
+# plot the training loss and accuracy
+plt.style.use("ggplot")
+plt.figure()
+plt.plot(H["train_loss"], label="train_loss")
+plt.plot(H["val_loss"], label="val_loss")
+plt.plot(H["train_acc"], label="train_acc")
+plt.plot(H["val_acc"], label="val_acc")
+plt.title("Training Loss and Accuracy on Dataset")
+plt.xlabel("Epoch #")
+plt.ylabel("Loss/Accuracy")
+plt.legend(loc="lower left")
+plt.savefig(args["plot"])
+
+# serialize the model to disk
+torch.save(model, args["model"])
+```
+
+this code generates a `matplotlib` figure for our training history.
+
+We then call `torch.save` to save our PyTorch model weights to disk so that we can load them from disk and make predictions from a separate Python script.
+
+As a whole, reviewing this script shows you how much more control PyTorch gives you over the training loop — this is both a good and a bad thing:
+
+* It’s *good* if you want *full control* over the training loop and need to implement custom procedures
+* It’s *bad* when your training loop is simple and a Keras/TensorFlow equivalent to *model.fit* would suffice
+
+## Training our CNN with PyTorch
+
+We are now ready to train our CNN using PyTorch.
+
+From there, you can train your PyTorch CNN by executing the following command:
+
+```bash
+$ python train.py --model output/model.pth --plot output/plot.png
+```
+
+<figure>
+<img src="./images/Figure3.png" width=100% align="center">
+	<span style="font-size: 0.8em; color:gray;"><figcaption align="center">
+		Figure 4: Plotting our training history with PyTorch.
+	</figcaption></span>
+</figure>
+
+At the end of the final epoch we have obtained **99.67% training accuracy** and **98.23% validation accuracy.**
+
+When we evaluate on our testing set we reach **≈95% accuracy**, which is quite good given the complexity of the Hiragana characters and the simplicity of our shallow network architecture (using a deeper network such as a VGG-inspired model or ResNet-like would allow us to obtain even higher accuracy, but those models are more complex for an introduction to CNNs with PyTorch).
+
+Furthermore, as **Figure 3** shows, our training history plot is smooth, demonstrating there is little/no overfitting happening.
+
+Before moving to the next section, take a look at your `output` directory:
+
+## Implementing our PyTorch prediction script
+
+The final script we are reviewing here will show you how to make predictions with a PyTorch model that has been saved to disk.
+
+Open the `predict.py` file in your project directory structure, and we’ll get started:
+
+```python
+# set the numpy seed for better reproducibility
+import numpy as np
+np.random.seed(42)
+
+# import the necessary packages
+from torch.utils.data import DataLoader
+from torch.utils.data import Subset
+from torchvision.transforms import ToTensor
+from torchvision.datasets import KMNIST
+import argparse
+import imutils
+import torch
+import cv2
+```
+
+This code imports our required Python packages. We set the NumPy random seed at the top of the script for better reproducibility across machines.
+
+We then import:
+
+* `DataLoader`: Used to load our KMNIST testing data
+* `Subset`: Builds a subset of the testing data  
+* `ToTensor`: Converts our input data to a PyTorch tensor data type  
+* `KMNIST`: The Kuzushiji-MNIST dataset loader built into the PyTorch library  
+* `cv2`: Our OpenCV bindings which we’ll use for basic drawing and displaying output images on our screen  
+
+Next comes our command line arguments:
+
+```python
+# construct the argument parser and parse the arguments
+ap = argparse.ArgumentParser()
+ap.add_argument("-m", "--model", type=str, required=True,
+	help="path to the trained PyTorch model")
+args = vars(ap.parse_args())
+```
+
+We only need a single argument here, `--model`, the path to our trained PyTorch model saved to disk. Presumably, this switch will point to `output/model.pth`.
+
+Moving on, let’s set our `device`:
+
+```python
+# set the device we will be using to test the model
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# load the KMNIST dataset and randomly grab 10 data points
+print("[INFO] loading the KMNIST test dataset...")
+testData = KMNIST(root="data", train=False, download=True,
+	transform=ToTensor())
+idxs = np.random.choice(range(0, len(testData)), size=(10,))
+testData = Subset(testData, idxs)
+
+# initialize the test data loader
+testDataLoader = DataLoader(testData, batch_size=1)
+
+# load the model and set it to evaluation mode
+model = torch.load(args["model"]).to(device)
+model.eval()
+```
+
+`device` determines if we will be performing inference on our CPU or GPU.
+
+We then load the testing data from the KMNIST dataset. We randomly sample a total of 10 images from this datase using the Subset class (which creates a smaller “view” of the full testing data).
+
+A DataLoader is created to pass our subset of testing data through the model
+
+We then load our serialized PyTorch model from disk, passing it to the appropriate device.
+
+Finally, the model is placed into evaluation mode.
+
+Let’s now make predictions on a sample of our testing set:
+
+```python
+# switch off autograd
+with torch.no_grad():
+	# loop over the test set
+	for (image, label) in testDataLoader:
+		# grab the original image and ground truth label
+		origImage = image.numpy().squeeze(axis=(0, 1))
+		gtLabel = testData.dataset.classes[label.numpy()[0]]
+
+		# send the input to the device and make predictions on it
+		image = image.to(device)
+		pred = model(image)
+
+		# find the class label index with the largest corresponding
+		# probability
+		idx = pred.argmax(axis=1).cpu().numpy()[0]
+		predLabel = testData.dataset.classes[idx]
+```
+
+`with torch.no_grad()` turns off gradient tracking, while `for loop` loops over all images in our subset of the test set.
+
+For each image, we:
+
+1. Grab the current image and turn it into a NumPy array (so we can draw on it later with OpenCV)
+2. Extracts the ground-truth class label
+3. Sends the `image` to the appropriate `device`
+4. Uses our trained LeNet model to make predictions on the current `image`
+5. Extracts the class label with the top predicted probability
+All that’s left is a bit of visualization:
+
+```python
+		# convert the image from grayscale to RGB (so we can draw on
+		# it) and resize it (so we can more easily see it on our
+		# screen)
+		origImage = np.dstack([origImage] * 3)
+		origImage = imutils.resize(origImage, width=128)
+
+		# draw the predicted class label on it
+		color = (0, 255, 0) if gtLabel == predLabel else (0, 0, 255)
+		cv2.putText(origImage, gtLabel, (2, 25),
+			cv2.FONT_HERSHEY_SIMPLEX, 0.95, color, 2)
+
+		# display the result in terminal and show the input image
+		print("[INFO] ground truth label: {}, predicted label: {}".format(
+			gtLabel, predLabel))
+		cv2.imshow("image", origImage)
+		cv2.waitKey(0)
+```
+Each image in the KMNIST dataset is a single channel grayscale image; however, we want to use OpenCV’s `cv2.putText` function to draw the predicted class label and ground-truth label on the `image`.
+
+To draw RGB colors on a grayscale image, we first need to create an RGB representation of the grayscale image by stacking the grayscale image depth-wise a total of three times.
+
+Additionally, we resize the `origImage` so that we can more easily see it on our screen (by default, KMNIST images are only *28×28* pixels, which can be hard to see, especially on a high resolution monitor).
+
+From there, we determine the text `color` and draw the label on the output image.
+
+We wrap up the script by displaying the output `origImage` on our screen.
+
+## Making predictions with our trained PyTorch model
+
+We are now ready to make predictions using our trained PyTorch model!
+
+From there, you can execute the predict.py script:
+
+```bash
+$ python predict.py --model output/model.pth
+```
+
+<figure>
+<img src="./images/Figure4.png" width=100% align="center">
+	<span style="font-size: 0.8em; color:gray;"><figcaption align="center">
+		Figure 4: Making predictions on handwritten characters using PyTorch and our trained CNN.
+	</figcaption></span>
+</figure>
+
+As our output demonstrates, we have been able to successfully recognize each of the Hiragana characters using our PyTorch model.
