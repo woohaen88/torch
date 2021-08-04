@@ -2,7 +2,7 @@
 
 ## Title
 [1. Intro](#1.-Intro)  
-[2. The KMNIST dataset](#2.-The-KMNIST-dataset)
+[2. The KMNIST dataset](#2.-The-KMNIST-dataset)  
 [3. Project structure](#3.-Project-structure)  
 [4. Implementing a Convolutional Neural Network (CNN) with PyTorch](#4.-Implementing-a-Convolutional-Neural-Network-(CNN)-with-PyTorch)  
 [5. Creating our CNN training script with PyTorch](#5.-Creating-our-CNN-training-script-with-PyTorch)  
