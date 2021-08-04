@@ -610,7 +610,7 @@ $ python train.py --model output/model.pth --plot output/plot.png
 ```
 
 <figure>
-<img src="./images/Figure3.png" width=100% align="center">
+<img src="./images/Figure3.png" width=70% align="center">
 	<span style="font-size: 0.8em; color:gray;"><figcaption align="center">
 		Figure 4: Plotting our training history with PyTorch.
 	</figcaption></span>
