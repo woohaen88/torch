@@ -770,7 +770,7 @@ $ python predict.py --model output/model.pth
 ```
 
 <figure>
-<img src="./images/Figure4.png" width=100% align="center">
+<img src="./images/Figure4.png" width=70% align="center">
 	<span style="font-size: 0.8em; color:gray;"><figcaption align="center">
 		Figure 4: Making predictions on handwritten characters using PyTorch and our trained CNN.
 	</figcaption></span>
