@@ -1,17 +1,16 @@
 # PyTorch: Training your first Convolutional Neural Network
 
 ## Title
-[Intro](#Intro)  
-[The KMNIST dataset](#The-KMNIST-dataset)
-[Project structure](#Project-structure)  
-[Implementing a Convolutional Neural Network (CNN) with PyTorch](#Implementing-a-Convolutional-Neural-Network-(CNN)-with-PyTorch)  
-[Creating our CNN training script with PyTorch](#Creating-our-CNN-training-script-with-PyTorch)  
-[Training our CNN with PyTorch
-](#Training-our-CNN-with-PyTorch)  
-[Implementing our PyTorch prediction script](#Implementing-our-PyTorch-prediction-script)  
-[Making predictions with our trained PyTorch model](#Making-predictions-with-our-trained-PyTorch-model)
+[1. Intro](#1.-Intro)  
+[2. The KMNIST dataset](#2.-The-KMNIST-dataset)
+[3. Project structure](#3.-Project-structure)  
+[4. Implementing a Convolutional Neural Network (CNN) with PyTorch](#4.-Implementing-a-Convolutional-Neural-Network-(CNN)-with-PyTorch)  
+[5. Creating our CNN training script with PyTorch](#5.-Creating-our-CNN-training-script-with-PyTorch)  
+[6. Training our CNN with PyTorch](#6.-Training-our-CNN-with-PyTorch)  
+[7. Implementing our PyTorch prediction script](#7.-Implementing-our-PyTorch-prediction-script)  
+[8. Making predictions with our trained PyTorch model](#8.-Making-predictions-with-our-trained-PyTorch-model)
 
-## Intro
+## 1. Intro
 In this tutorial, you will receive a gentle introduction to training your first Convolutional Neural Network(CNN) using the PyTorch deep learning library. This network will be able to recognize handwritten Hiragana characters.
 That tutorial focused on simple numerical data. we will take the next step and learn how to train a CNN to recognize handwritten Hiragana characters using the Kuzushiji-MNIST (KMNIST) dataset.
 
@@ -39,7 +38,7 @@ $ pip install scikit-learn
 ```
 **If you need help configuring your development environment for PyTorch, I highly recommend that you read the PyTorch documentation** --- PyTorch’s documentation is comprehensive and will have you up and running quickly.
 
-## The KMNIST dataset
+## 2. The KMNIST dataset
 <figure>
 <img src="./images/Figure1.png" width=100% align="center">
 	<span style="font-size: 0.8em; color:gray;"><figcaption align="center">
@@ -57,7 +56,7 @@ There are a total of 10 classes (meaning 10 Hiragana characters) in the KMNIST d
 
 And lucky for us, the KMNIST dataset is built into PyTorch, making it super easy for us to work with!
 
-## Project structure
+## 3. Project structure
 Before we start implementing and PyTorch code, let’s first review our project directory structure.
 
 You’ll then be presented with the following directory structure:
@@ -85,7 +84,7 @@ The output directory will be populated with plot.png (a plot of our training/val
 
 With our project directory structure reviewed, we can move on to implementing our CNN with PyTorch.
 
-## Implementing a Convolutional Neural Network (CNN) with PyTorch
+## 4. Implementing a Convolutional Neural Network (CNN) with PyTorch
 <figure>
 <img src="./images/Figure2.png" width=100% align="center">
 	<span style="font-size: 0.8em; color:gray;"><figcaption align="center">
@@ -237,7 +236,7 @@ The `output` of the network is then returned to the calling function.
 
 * PyTorch can then make predictions using your network and perform automatic backpropagation, thanks to the autograd module
 
-## Creating our CNN training script with PyTorch
+## 5. Creating our CNN training script with PyTorch
 
 With our CNN architecture implemented, we can move on to creating our training script with PyTorch.
 
@@ -599,7 +598,7 @@ As a whole, reviewing this script shows you how much more control PyTorch gives 
 * It’s *good* if you want *full control* over the training loop and need to implement custom procedures
 * It’s *bad* when your training loop is simple and a Keras/TensorFlow equivalent to *model.fit* would suffice
 
-## Training our CNN with PyTorch
+## 6. Training our CNN with PyTorch
 
 We are now ready to train our CNN using PyTorch.
 
@@ -624,7 +623,7 @@ Furthermore, as **Figure 3** shows, our training history plot is smooth, demonst
 
 Before moving to the next section, take a look at your `output` directory:
 
-## Implementing our PyTorch prediction script
+## 7. Implementing our PyTorch prediction script
 
 The final script we are reviewing here will show you how to make predictions with a PyTorch model that has been saved to disk.
 
@@ -759,7 +758,7 @@ From there, we determine the text `color` and draw the label on the output image
 
 We wrap up the script by displaying the output `origImage` on our screen.
 
-## Making predictions with our trained PyTorch model
+## 8. Making predictions with our trained PyTorch model
 
 We are now ready to make predictions using our trained PyTorch model!
 
