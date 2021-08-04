@@ -340,3 +340,144 @@ The `download=True` flag indicates that PyTorch will automatically download and 
 Also take note of the `transform` parameter --- here we can apply a number of data transformations (outside the scope of this tutorial but will be covered soon). The only transform we need is to convert the NumPy array loaded by PyTorch into a tensor data type.
 
 With our training and testing set loaded, we drive our training and validation set on `calculate the train/validation split`. Using PyTorch's `random_split` funcion, we can easily split our data.
+
+We now have three sets of data:  
+1. Training
+2. Validation
+3. Testing
+
+```python
+# initialize the train, validation, and test data loaders
+trainDataLoader = DataLoader(trainData, shuffle=True,
+	batch_size=BATCH_SIZE)
+valDataLoader = DataLoader(valData, batch_size=BATCH_SIZE)
+testDataLoader = DataLoader(testData, batch_size=BATCH_SIZE)
+
+# calculate steps per epoch for training and validation set
+trainSteps = len(trainDataLoader.dataset) // BATCH_SIZE
+valSteps = len(valDataLoader.dataset) // BATCH_SIZE
+```
+
+Building the `DataLoader` objects is accomplished. We set `shuffle=True` only for our `trainDataLoader` since our validation and testing sets do not requires shuffling.
+
+We also derive the number of training steps and validation stpes per epoch.
+
+At this point our data is ready for training; however, we don't have ad model to train yet!
+
+```python
+# initialize the LeNet model
+print("[INFO] initializing the LeNet model...")
+model = LeNet(
+	numChannels=1,
+	classes=len(trainData.dataset.classes)).to(device)
+
+# initialize our optimizer and loss function
+opt = Adam(model.parameters(), lr=INIT_LR)
+lossFn = nn.NLLLoss()
+
+# initialize a dictionary to store training history
+H = {
+	"train_loss": [],
+	"train_acc": [],
+	"val_loss": [],
+	"val_acc": []
+}
+
+# measure how long training is going to take
+print("[INFO] training the network...")
+startTime = time.time()
+```
+
+This code block initialize our `model`. Since the KMNIST dataset is grayscale, we set `numChannels=1`. We can easily set the number of `classes` by calling `dataset.classes` of our `trainData`.
+
+We also call `to(device)` to move the `model` to eigher our CPU or GPU.
+
+`opt`, `lossFn` initialize our optimizer and loss function. We'll use the Adam optimizer for training and the negative log-likelihood for our loss function.
+
+**When we combine the `nn.NLLoss` class with `LogSoftmax` in our model definition, we arrive at categorical cross-entropy loss(which is the equivalent to training a model with an output `Linear` layer and an `nn.CrossEntropyLoss` loss).**Basically, PyTorch allows you to implement categorical cross-entropy in two separate ways.
+
+Get used to seeing both methods as some seep learning practitioners(almost arbitrarily) prefer one over the other.
+
+We then initialize `H`, our training history dictonary. After every epoch we'll update this dictionary with our training loss, training accuracy, testing loss, and testing accuracy for the given epoch.
+
+Finally, we start a timer to measure how long training takes `startTime`.
+
+At this point, all of our initializations are completes, so it's time to train our model.
+
+```python
+# loop over our epochs
+for e in range(0, EPOCHS):
+	# set the model in training mode
+	model.train()
+
+	# initialize the total training and validation loss
+	totalTrainLoss = 0
+	totalValLoss = 0
+
+	# initialize the number of correct predictions in the training
+	# and validation step
+	trainCorrect = 0
+	valCorrect = 0
+
+	# loop over the training set
+	for (x, y) in trainDataLoader:
+		# send the input to the device
+		(x, y) = (x.to(device), y.to(device))
+
+		# perform a forward pass and calculate the training loss
+		pred = model(x)
+		loss = lossFn(pred, y)
+
+		# zero out the gradients, perform the backpropagation step,
+		# and update the weights
+		opt.zero_grad()
+		loss.backward()
+		opt.step()
+
+		# add the loss to the total training loss so far and
+		# calculate the number of correct predictions
+		totalTrainLoss += loss
+		trainCorrect += (pred.argmax(1) == y).type(
+			torch.float).sum().item()
+```
+
+We loop over our desired number of epochs.
+
+We then proceed to:  
+1. Put the model in `train()` mode
+2. Initialize our training loss and validation loss for the current epoch
+3. Initialize our number of correct training and validation predictions for the current epoch
+
+second `for loop` shows the benefit of using PyTorch's `DataLoader` class - all we have to do is start a `for` loop over the `DataLoader` object. PyTroch *automatically* yields a batch of training data. Under the hood, the `DataLoader` is also shuffling our training data (and if we were doing any additional preprocessing or data augmentation, it would happen here as well).
+
+For eash batch of data we perform a forward pass, obtain our predictions, and compute the loss.
+
+**Next comes the all *important* step of**:  
+1. Zeroing our gradient
+2. Performing backpropagation
+3. Updating the weights of our model
+
+**Seriously, don't forget this step!** Failure to do those three stpes *in that exact order* will lead to erroneous training results. Whenever you write a training loop with PyTorch, I highly recommend you insert those three lines of code *before you do anything else* so that you are reminded to ensure they are in the proper place.
+
+We wrap up the code block by updating our `totalTrainLoss` and `trainCorrect` bookkeeping variables.
+
+At this point, we've looped over all batches of data in our training set for the current epoch -- now we can evaluate our model on the validation set:
+```python
+	# switch off autograd for evaluation
+	with torch.no_grad():
+		# set the model in evaluation mode
+		model.eval()
+
+		# loop over the validation set
+		for (x, y) in valDataLoader:
+			# send the input to the device
+			(x, y) = (x.to(device), y.to(device))
+
+			# make the predictions and calculate the validation loss
+			pred = model(x)
+			totalValLoss += lossFn(pred, y)
+
+			# calculate the number of correct predictions
+			valCorrect += (pred.argmax(1) == y).type(
+				torch.float).sum().item()
+```
